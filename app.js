@@ -29,15 +29,21 @@ app.use(compression());
 
 app.use(bodyParser.json());
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 
-const sessionStore = new MongoStore({mongooseConnection: mongoose.connection});
+const sessionStore = new MongoStore({
+    mongooseConnection: mongoose.connection
+});
 
 app.use(session({
     key: 'express.sid',
     store: sessionStore,
     secret: process.env.SESSION_SECRET || config.session.secret,
-    cookie: {httpOnly: false}
+    cookie: {
+        httpOnly: false
+    }
 }));
 
 app.use(passport.initialize());
