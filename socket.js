@@ -4,7 +4,7 @@ const debug = require('debug')('chat');
 const events = require('./events');
 const models = require('./models');
 
-module.exports = function (config, io) {
+module.exports = function(config, io) {
     console.log("entered ")
     io.sockets.on('connection', (socket) => {
         socket.request.user = socket.request.user.toLowerCase();
@@ -16,9 +16,11 @@ module.exports = function (config, io) {
         if (connectedClientsForUser.length <= 1) {
             socket.broadcast.emit(events.online, socket.request.user);
 
-            models.User.findOneAndUpdate(
-                {'local.username': socket.request.user},
-                {'local.online': true}).exec()
+            models.User.findOneAndUpdate({
+                    'local.username': socket.request.user
+                }, {
+                    'local.online': true
+                }).exec()
                 .then(() => debug(`${socket.request.user} is now online with client ${socket.id}`));
         } else {
             debug(`${socket.request.user} is now connected with new client ${socket.id}`);
@@ -38,9 +40,14 @@ module.exports = function (config, io) {
 
             channelToJoin = channelToJoin.toLowerCase();
 
-            models.Channel.findOne({name: channelToJoin}, (err, channel) => {
+            models.Channel.findOne({
+                name: channelToJoin
+            }, (err, channel) => {
                 if (channel) {
-                    models.User.findOne({'local.username': socket.request.user, 'local.channels': channelToJoin}).exec()
+                    models.User.findOne({
+                            'local.username': socket.request.user,
+                            'local.channels': channelToJoin
+                        }).exec()
                         .then((user) => {
                             if (user) {
                                 debug(`error joining channel: ${socket.request.user} is already joined to ${channelToJoin}`);
@@ -50,9 +57,13 @@ module.exports = function (config, io) {
                                     socket1.emit(events.join, channelToJoin);
                                 });
 
-                                return models.User.findOneAndUpdate(
-                                    {'local.username': socket.request.user},
-                                    {$push: {'local.channels': channelToJoin}}).exec();
+                                return models.User.findOneAndUpdate({
+                                    'local.username': socket.request.user
+                                }, {
+                                    $push: {
+                                        'local.channels': channelToJoin
+                                    }
+                                }).exec();
                             }
                         })
                         .then(() => {
@@ -69,9 +80,13 @@ module.exports = function (config, io) {
                     newChannel.name = channelToJoin;
 
                     newChannel.save()
-                        .then(() => models.User.findOneAndUpdate(
-                            {'local.username': socket.request.user},
-                            {$push: {'local.channels': channelToJoin}}).exec())
+                        .then(() => models.User.findOneAndUpdate({
+                            'local.username': socket.request.user
+                        }, {
+                            $push: {
+                                'local.channels': channelToJoin
+                            }
+                        }).exec())
                         .then(() => debug(`${socket.request.user} (${socket.id}) joined channel ${channelToJoin}`));
                 }
             });
@@ -93,7 +108,10 @@ module.exports = function (config, io) {
             channel = channel.toLowerCase();
 
 
-            models.User.findOne({'local.username': socket.request.user, 'local.channels': channel}).exec()
+            models.User.findOne({
+                    'local.username': socket.request.user,
+                    'local.channels': channel
+                }).exec()
                 .then((user) => {
                     if (user) {
                         connectedClientsForUser.forEach((socket1) => {
@@ -101,9 +119,13 @@ module.exports = function (config, io) {
                             socket1.emit(events.leave, channel);
                         });
 
-                        return models.User.findOneAndUpdate(
-                            {'local.username': socket.request.user},
-                            {$pull: {'local.channels': channel}});
+                        return models.User.findOneAndUpdate({
+                            'local.username': socket.request.user
+                        }, {
+                            $pull: {
+                                'local.channels': channel
+                            }
+                        });
                     }
                     throw (`${socket.request.user} is not joined to ${channel}`);
                 })
@@ -177,7 +199,7 @@ module.exports = function (config, io) {
             }
 
             connectedClientsForUser.forEach((socket1) => {
-                if(socket1 !== socket) {
+                if (socket1 !== socket) {
                     socket1.emit(events.ownPrivateMsg, {
                         to: data.to,
                         msg: data.msg,
@@ -188,9 +210,11 @@ module.exports = function (config, io) {
 
         function handleDisconnect() {
             if (connectedClientsForUser.length <= 1) {
-                models.User.findOneAndUpdate(
-                    {'local.username': socket.request.user},
-                    {'local.online': false}).exec()
+                models.User.findOneAndUpdate({
+                        'local.username': socket.request.user
+                    }, {
+                        'local.online': false
+                    }).exec()
                     .then(() => {
                         debug(`${socket.request.user} (${socket.id}) is now offline`);
 
@@ -203,14 +227,16 @@ module.exports = function (config, io) {
 
         function joinSavedChannels(data, socket) {
             console.log()
-            models.User.findOne(
-                {'local.username': socket.request.user},
-                {'local.channels': 1}).exec()
+            models.User.findOne({
+                    'local.username': socket.request.user
+                }, {
+                    'local.channels': 1
+                }).exec()
                 .then((user) => {
                     user.local.channels.map((channel) => {
                         socket.join(channel);
                         console.log("here")
-                        // socket.emit(events.join, channel);
+                            // socket.emit(events.join, channel);
                     });
                 });
         }
