@@ -5,7 +5,7 @@ const events = require('./events');
 const models = require('./models');
 
 module.exports = function (config, io) {
-    console.log("entered")
+    console.log("entered ")
     io.sockets.on('connection', (socket) => {
         socket.request.user = socket.request.user.toLowerCase();
 
