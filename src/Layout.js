@@ -20,7 +20,7 @@ class Layout extends Component {
       <div>
         <Sidebar
           sidebar={<div style={{ backgroundColor: 'white', height: '100%', paddingLeft: '10', paddingRight: '10' }}>testi
-                  tesssssttt</div>}
+                    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</div>}
           open={this.state.open} docked={false} onSetOpen={this.onSetOpen}
         >
           <b onClick={() => this.setState({ open: true })}>Mains content</b>
