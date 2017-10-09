@@ -1,6 +1,8 @@
-# assignment
+# Chat app built with React.
 
-Chat app written in node.js and mongodb.
+Slack like app built with React and Node.js
+
+
 
 1) git clone 
 2) npm install 
